@@ -2,8 +2,12 @@ from nicegui import app, ui
 import sqlite3
 import os
 
-# Database Setup
-conn = sqlite3.connect("chat.db", check_same_thread=False)
+# ✅ Get PORT from environment (Render sets this dynamically)
+PORT = int(os.getenv("PORT", 8080))
+
+# ✅ Database Setup (Fix potential lock issues)
+DB_PATH = "chat.db"
+conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 cursor = conn.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS messages (
                     sender TEXT, receiver TEXT, avatar TEXT, text TEXT)''')
@@ -71,8 +75,8 @@ def index():
             .props('rounded outlined') \
             .on('keydown.enter', send)
 
-# ✅ Expose NiceGUI’s FastAPI app
-app = app  # This makes the app callable for Gunicorn/Uvicorn
+# ✅ Expose NiceGUI’s FastAPI app correctly
+app = app  # Gunicorn/Uvicorn requires this
 
 if __name__ == "__main__":
-    ui.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
+    ui.run(host="0.0.0.0", port=PORT)
