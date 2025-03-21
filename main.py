@@ -23,13 +23,17 @@ def load_messages():
 
 load_messages()  # Load messages when the app starts
 
+# ✅ Chat UI Column (Declared Globally)
+chat_column = ui.column()
+
 @ui.refreshable
 def chat_messages(own_id, receiver_id):
     """Show only messages between the two users"""
-    ui.clear()  # Clear previous messages
-    for sender, receiver, avatar, text in messages:
-        if (sender == own_id and receiver == receiver_id) or (sender == receiver_id and receiver == own_id):
-            ui.chat_message(avatar=avatar, text=text, sent=sender == own_id)
+    chat_column.clear()  # ✅ Corrected: Clear the chat UI
+    with chat_column:
+        for sender, receiver, avatar, text in messages:
+            if (sender == own_id and receiver == receiver_id) or (sender == receiver_id and receiver == own_id):
+                ui.chat_message(avatar=avatar, text=text, sent=sender == own_id)
 
 @ui.page('/')
 def index():
@@ -44,9 +48,7 @@ def index():
             return
 
         avatar = f'https://robohash.org/{user}?bgset=bg2'  # Fixed user avatar
-        chat_column.clear()  # Reset chat UI
-        with chat_column:
-            chat_messages(user, receiver)  # Show chat for the two users
+        chat_messages.refresh(user, receiver)  # ✅ Refresh chat for the two users
 
     def send():
         """Send message and store in database"""
@@ -56,7 +58,7 @@ def index():
                            (user, receiver, avatar, text.value))
             conn.commit()
             text.value = ''  # Clear input
-            chat_messages.refresh()
+            chat_messages.refresh(user, receiver)  # ✅ Corrected refresh
 
     # Input fields for usernames
     ui.label("Enter your Username:")
@@ -67,8 +69,9 @@ def index():
 
     ui.button("Start Chat", on_click=start_chat)
 
-    # Chat area
-    chat_column = ui.column()
+    # ✅ Chat area (Global `chat_column` is used)
+    with chat_column:
+        ui.label("Chat messages will appear here.")
 
     with ui.footer().classes('bg-white p-2'):
         text = ui.input(placeholder='Type a message...') \
@@ -77,5 +80,4 @@ def index():
 
 # ✅ Render Fix: Allow Multiprocessing
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)), title="Chat App", dark=True)
-
+    ui.run(host="0.0.0.0", port=PORT, title="Chat App", dark=True)
