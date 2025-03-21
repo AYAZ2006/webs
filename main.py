@@ -71,8 +71,6 @@ def index():
             .props('rounded outlined') \
             .on('keydown.enter', send)
 
-# ✅ FIX: Use `ui.run_with()` instead of `ui` for ASGI
-app = ui.run_with(
-    port=int(os.getenv("PORT", 8080)),
-    host="0.0.0.0"
-)
+# ✅ FIX: Use `ui.run()` inside `if __name__ == "__main__"`
+if __name__ == "__main__":
+    ui.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
