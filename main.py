@@ -77,4 +77,5 @@ def index():
 
 # ✅ Render Fix: Allow Multiprocessing
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(host="0.0.0.0", port=PORT)
+    ui.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)), title="Chat App", dark=True)
+
