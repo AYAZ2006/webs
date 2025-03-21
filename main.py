@@ -1,8 +1,8 @@
-from nicegui import app, ui
+from nicegui import ui
 import sqlite3
 import os
 
-# ✅ Get PORT dynamically (Render uses an env variable)
+# ✅ Get PORT dynamically (Render uses this env variable)
 PORT = int(os.getenv("PORT", 8080))
 
 # ✅ Database Setup
@@ -13,7 +13,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS messages (
                     sender TEXT, receiver TEXT, avatar TEXT, text TEXT)''')
 conn.commit()
 
-messages = []  # To hold messages in memory
+messages = []  # Holds messages in memory
 
 def load_messages():
     """Load messages from the database at startup"""
@@ -26,7 +26,7 @@ load_messages()  # Load messages when the app starts
 @ui.refreshable
 def chat_messages(own_id, receiver_id):
     """Show only messages between the two users"""
-    ui.clear()  # Clear previous messages before updating
+    ui.clear()  # Clear previous messages
     for sender, receiver, avatar, text in messages:
         if (sender == own_id and receiver == receiver_id) or (sender == receiver_id and receiver == own_id):
             ui.chat_message(avatar=avatar, text=text, sent=sender == own_id)
@@ -75,8 +75,6 @@ def index():
             .props('rounded outlined') \
             .on('keydown.enter', send)
 
-# ✅ Expose NiceGUI’s FastAPI app correctly for Gunicorn/Uvicorn
-asgi_app = app
-
+# ✅ Start NiceGUI properly (Fix for Render Deployment)
 if __name__ == "__main__":
     ui.run(host="0.0.0.0", port=PORT)
