@@ -2,10 +2,10 @@ from nicegui import app, ui
 import sqlite3
 import os
 
-# ✅ Get PORT from environment (Render sets this dynamically)
+# ✅ Get PORT dynamically (Render uses an env variable)
 PORT = int(os.getenv("PORT", 8080))
 
-# ✅ Database Setup (Fix potential lock issues)
+# ✅ Database Setup
 DB_PATH = "chat.db"
 conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 cursor = conn.cursor()
@@ -75,8 +75,8 @@ def index():
             .props('rounded outlined') \
             .on('keydown.enter', send)
 
-# ✅ Expose NiceGUI’s FastAPI app correctly
-app = app  # Gunicorn/Uvicorn requires this
+# ✅ Expose NiceGUI’s FastAPI app correctly for Gunicorn/Uvicorn
+asgi_app = app
 
 if __name__ == "__main__":
     ui.run(host="0.0.0.0", port=PORT)
