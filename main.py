@@ -29,7 +29,7 @@ chat_column = ui.column()
 @ui.refreshable
 def chat_messages(own_id, receiver_id):
     """Show only messages between the two users"""
-    chat_column.clear()  # ✅ Corrected: Clear the chat UI
+    chat_column.clear()  # ✅ Ensure old messages are removed
     with chat_column:
         for sender, receiver, avatar, text in messages:
             if (sender == own_id and receiver == receiver_id) or (sender == receiver_id and receiver == own_id):
@@ -37,9 +37,13 @@ def chat_messages(own_id, receiver_id):
 
 @ui.page('/')
 def index():
+    user = ""  # ✅ Define user inside function scope
+    receiver = ""
+    avatar = ""
+
     def start_chat():
         """Save username and receiver, then show chat UI"""
-        global user, receiver, avatar
+        nonlocal user, receiver, avatar  # ✅ Use `nonlocal` to update outer function variables
         user = username.value.strip()
         receiver = receiver_name.value.strip()
 
@@ -58,7 +62,7 @@ def index():
                            (user, receiver, avatar, text.value))
             conn.commit()
             text.value = ''  # Clear input
-            chat_messages.refresh(user, receiver)  # ✅ Corrected refresh
+            chat_messages.refresh(user, receiver)  # ✅ Refresh messages after sending
 
     # Input fields for usernames
     ui.label("Enter your Username:")
@@ -67,7 +71,7 @@ def index():
     ui.label("Chat with (Receiver):")
     receiver_name = ui.input(placeholder="Receiver's username")
 
-    ui.button("Start Chat", on_click=start_chat)
+    ui.button("Start Chat", on_click=start_chat)  # ✅ Corrected on_click
 
     # ✅ Chat area (Global `chat_column` is used)
     with chat_column:
