@@ -1,4 +1,4 @@
-from nicegui import ui
+from nicegui import app, ui
 import sqlite3
 import os
 
@@ -71,6 +71,8 @@ def index():
             .props('rounded outlined') \
             .on('keydown.enter', send)
 
-# ✅ FIX: Use `ui.run()` inside `if __name__ == "__main__"`
+# ✅ Expose NiceGUI’s FastAPI app
+app = app  # This makes the app callable for Gunicorn/Uvicorn
+
 if __name__ == "__main__":
     ui.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
