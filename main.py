@@ -75,6 +75,6 @@ def index():
             .props('rounded outlined') \
             .on('keydown.enter', send)
 
-# ✅ Start NiceGUI properly (Fix for Render Deployment)
-if __name__ == "__main__":
+# ✅ Render Fix: Allow Multiprocessing
+if __name__ in {"__main__", "__mp_main__"}:
     ui.run(host="0.0.0.0", port=PORT)
